@@ -1,0 +1,42 @@
+<% include ../partials/header %>
+
+<h1>PlayerTwo</h1>
+<button class='readyToPlay'>ready</button>
+
+<div style='display: none;' class='p2'>
+	<button class='input' id="2-0">0</button>
+	<button class='input' id="2-1">1</button>
+	<button class='input' id="2-2">2</button>
+	<button class='input' id="2-3">3</button>
+	<button class='input' id="2-4">4</button>
+	<button class='input' id="2-5">5</button>
+	<button class='input' id="2-6">6</button>
+	<button class='input' id="2-7">7</button>
+	<button class='input' id="2-8">8</button>
+	<button class='input' id="2-9">9</button>	
+</div>
+
+<script>
+	/* global $ io location */
+	$(function () {
+	    var socket = io();
+	    $('.readyToPlay').on('click', function() {
+	        socket.emit('player connect', 'playerTwo')
+	    });
+        
+        // Initializes player cards after pressing 'ready'
+        socket.on('player connect', function(data) {
+        	if (data.playerTwo.ready === true) {
+	        	$('.readyToPlay').remove();
+	        	$('.p2').show();
+        	}
+        });
+        
+        $('.input').on('click', function() {
+        	socket.emit('playerTwo move', $(this).text());
+        	$(this).remove();
+        });
+    });
+</script>
+
+<% include ../partials/footer %>

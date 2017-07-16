@@ -1,0 +1,45 @@
+<% include ../partials/header %>
+
+<h1>PlayerOne</h1>
+<button class='readyToPlay'>ready</button>
+
+<div class='p1'>
+</div>
+
+<script>
+    /* global $ io location */
+    $(function () {
+        var socket = io();
+        $('.readyToPlay').on('click', function() {
+            socket.emit('player connect', 'playerOne')
+        });
+        
+        // Initializes player cards after pressing 'ready'
+        socket.on('player connect', function(data) {
+        	if (data.playerOne.ready === true) {
+        	    $('title').text('Player One')
+	        	$('.readyToPlay').remove();
+	        	
+	        	if (data.player === 'playerOne') {
+    	        	data.playerOne.cards.forEach(function(card) {
+    	        	    $('.p1').append("<button class='input'>" + card + "</button>");
+    	        	});
+	        	}
+        	}
+        });
+        
+        socket.on('score update', function(data) {
+            data.playerOne.cards.forEach(function(card) {
+        	    $('.p1').append("<button class='input'>" + card + "</button>");
+        	});
+        });
+            
+        // added because clicking doesn't work otherwise
+        $('.p1').on('click', '.input', function() {
+        	socket.emit('playerOne move', $(this).text());
+        	$('.p1').empty();
+        });
+    });
+</script>
+        
+<% include ../partials/footer %>

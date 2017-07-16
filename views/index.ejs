@@ -1,0 +1,83 @@
+<% include partials/header %>
+
+<% if (playerOne.ready && playerTwo.ready) { %>
+    <h1 id='scoreboard'>0 - 0</h1>
+    <h2 id='roundCounter'>1</h2>
+    <p id='playerTurn'></p>
+    <h3>Player One submits: <span id='p1Input'></span></h3>
+    <h3>Player Two submits: <span id='p2Input'></span></h3>
+<% } else { %>
+    <h1><a href="/playerone">P1</a></h1>
+    <h1><a href="/playertwo">P2</a></h1>
+    <p>When the players are ready, refresh to start the game!</p>
+<% } %>
+
+<script>
+    /* global $ io location */
+    function submitClear() {
+        $('#p1Input').html('');
+        $('#p2Input').html('');
+    }
+    
+    $(function () {
+        var socket = io();
+        var winner = null;
+        
+        //TODO
+        // ADD SERVER CALL FOR CURRENT GAMEDATA IF USER REFRESHES THE GAME
+        
+        socket.on('player update', function(data) {
+            console.log(data);
+            if (data.playerOne.input) {
+                if ((parseInt(data.playerOne.input) % 2) === 0) {
+                    $('#p1Input').text('Black');
+                }
+                else {
+                    $('#p1Input').text('White');
+                }
+            }
+            
+            if (data.playerTwo.input) {
+                if ((parseInt(data.playerTwo.input) % 2) === 0) {
+                    $('#p2Input').text('Black');
+                    setTimeout(function() {
+                        submitClear();
+                    }, 2000);
+                }
+                else {
+                    $('#p2Input').text('White');
+                    setTimeout(function() {
+                        submitClear();
+                    }, 2000);
+                }
+            }
+            
+            
+            if (data.playerOne.inputBool && data.playerTwo.inputBool) {
+                console.log('Round results are in');
+                if (parseInt(data.playerOne.input) > parseInt(data.playerTwo.input)) {
+                    console.log('p1 is winner');
+                    winner = 'playerOne';
+                }
+                else {
+                    console.log('p2 is winner');
+                    winner = 'playerTwo';
+                }
+                socket.emit('round', winner);
+                winner = null;
+            }
+        });
+        
+        socket.on('score update', function(data) {
+            $('#scoreboard').text(data.playerOne.score + ' - ' + data.playerTwo.score);
+            $('#roundCounter').text(data.gameState.round);
+        });
+        
+        // socket.on('player move', function(data) {
+        //     $('#scoreboard').html(data.playerOne.score + ' - ' + data.playerTwo.score);
+        //     $('#roundCounter').text(gameState.round);
+        // });
+    });
+</script>
+
+<% include partials/footer %>
