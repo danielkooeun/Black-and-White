@@ -1,19 +1,30 @@
 <% include partials/header %>
 
-<% if (playerOne.ready && playerTwo.ready) { %>
+<div id='gameboard'>
     <h1 id='scoreboard'>0 - 0</h1>
-    <h2 id='roundCounter'>1</h2>
+    <div>Round: <span id='roundCounter'>1</span></div>
     <p id='playerTurn'></p>
     <h3>Player One submits: <span id='p1Input'></span></h3>
     <h3>Player Two submits: <span id='p2Input'></span></h3>
-<% } else { %>
+</div>
+
+<div id='pregame'>
     <h1><a href="/playerone">P1</a></h1>
     <h1><a href="/playertwo">P2</a></h1>
-    <p>When the players are ready, refresh to start the game!</p>
-<% } %>
+    <p>Connected players:</p>
+    <div id='connectedPlayers'>
+    </div>
+</div>
+
+<button id='reset'>Reset</button>
 
 <script>
     /* global $ io location */
+    function init() {
+        $('#gameboard').hide();
+        $('#pregame').show();
+    }
+    
     function submitClear() {
         $('#p1Input').html('');
         $('#p2Input').html('');
@@ -25,6 +36,23 @@
         
         //TODO
         // ADD SERVER CALL FOR CURRENT GAMEDATA IF USER REFRESHES THE GAME
+        
+        // game init. to hide gameboard until players connect
+        init();
+        
+        socket.on('player connect', function(data) {
+            if (data.playerOne.ready) {
+                $('#connectedPlayers').append('<p>Player 1 connected</p>');
+            }
+            if (data.playerTwo.ready) {
+                $('#connectedPlayers').append('<p>Player 2 connected</p>');
+            }
+            
+            if (data.playerOne.ready && data.playerTwo.ready) {
+                $('#gameboard').show();
+                $('#pregame').hide();
+            }
+        });
         
         socket.on('player update', function(data) {
             console.log(data);
@@ -73,10 +101,11 @@
             $('#roundCounter').text(data.gameState.round);
         });
         
-        // socket.on('player move', function(data) {
-        //     $('#scoreboard').html(data.playerOne.score + ' - ' + data.playerTwo.score);
-        //     $('#roundCounter').text(gameState.round);
-        // });
+        $('#reset').on('click', function() {
+            $('#connectedPlayers').empty();
+            init();
+            socket.emit('reset');
+        });
     });
 </script>
 

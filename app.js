@@ -9,21 +9,30 @@ var io = require('socket.io')(http);    // initialize socket.io by passing the s
 app.set('view engine', 'ejs')
 
 // player objects for game functionality
-const playerOne = {
-    ready: false,
-    score: 0,
-    input: null,
-    inputBool: false,
-    cards: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+const playerModel = function() {
+    this.ready = false;
+    this.score = 0;
+    this.input = null;
+    this.inputBool = null;
+    this.cards = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    
+    this.reset = function() {
+        this.ready = false;
+        this.score = 0;
+        this.input = null;
+        this.inputBool = null;
+        this.cards = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    }
+    // ready: false,
+    // score: 0,
+    // input: null,
+    // inputBool: false,
+    // cards: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 };
 
-const playerTwo = {
-    ready: false,
-    score: 0,
-    input: null,
-    inputBool: false,
-    cards: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-};
+
+const playerOne = new playerModel();
+const playerTwo = new playerModel();
 
 
 // game info variable
@@ -96,6 +105,11 @@ io.on('connection', function(socket) {
         console.log('Now it is round: ' + gameState.round);
         io.emit('score update', {gameState: gameState, playerOne: playerOne, playerTwo: playerTwo});
     });
+    
+    socket.on('reset', function() {
+        playerOne.reset();
+        io.emit('reset');
+    })
     
     socket.on('disconnect', function() {
         console.log('user disconnected');

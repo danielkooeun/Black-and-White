@@ -39,6 +39,10 @@
         	socket.emit('playerOne move', $(this).text());
         	$('.p1').empty();
         });
+        
+        socket.on('reset', function() {
+            location.reload();
+        });
     });
 </script>
         
