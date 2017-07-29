@@ -1,9 +1,14 @@
 <% include ../partials/header %>
-
+<div class='container player-box'>
+    
+     
 <h1>PlayerOne</h1>
 <button class='readyToPlay'>ready</button>
 
 <div class='p1'>
+</div>
+
+
 </div>
 
 <script>
@@ -17,7 +22,6 @@
         // Initializes player cards after pressing 'ready'
         socket.on('player connect', function(data) {
         	if (data.playerOne.ready === true) {
-        	    $('title').text('Player One')
 	        	$('.readyToPlay').remove();
 	        	
 	        	if (data.player === 'playerOne') {

@@ -1,12 +1,15 @@
 // TODO:
 // STYLESHEETS FOR INDEX, PLAYERS
 // REFRESH CALLS FOR EMIT
+// PLAYERS WHEN THEY TIE
 
-var app = require('express')();
+var express= require('express')
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);    // initialize socket.io by passing the server object
 
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
 
 // player objects for game functionality
 const playerModel = function() {
@@ -23,11 +26,6 @@ const playerModel = function() {
         this.inputBool = null;
         this.cards = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     }
-    // ready: false,
-    // score: 0,
-    // input: null,
-    // inputBool: false,
-    // cards: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 };
 
 
@@ -89,11 +87,16 @@ io.on('connection', function(socket) {
     
     // end of round, determining score -- called by index.js after player moves
     socket.on('round', function(winner) {
+        var tie = false;
         if (winner === 'playerOne') {
             playerOne.score++;
         }
-        else {
+        else if (winner === 'playerTwo') {
             playerTwo.score++;
+        }
+        else {
+            console.log('tie');
+            tie = true;
         }
         
         gameState.round++;
@@ -104,10 +107,14 @@ io.on('connection', function(socket) {
         
         console.log('Now it is round: ' + gameState.round);
         io.emit('score update', {gameState: gameState, playerOne: playerOne, playerTwo: playerTwo});
+        if (tie) {
+            io.emit('tie');
+        }
     });
     
     socket.on('reset', function() {
         playerOne.reset();
+        playerTwo.reset();
         io.emit('reset');
     })
     

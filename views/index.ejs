@@ -1,22 +1,70 @@
 <% include partials/header %>
+<div class='container main-page'>
+    
 
-<div id='gameboard'>
-    <h1 id='scoreboard'>0 - 0</h1>
-    <div>Round: <span id='roundCounter'>1</span></div>
-    <p id='playerTurn'></p>
-    <h3>Player One submits: <span id='p1Input'></span></h3>
-    <h3>Player Two submits: <span id='p2Input'></span></h3>
-</div>
+<div id='header' class="jumbotron jumbotron-fluid">
+    <h1 id='scoreboard' class="display-3">Black and White</h1>
+    <p id='roundCounter' class="lead">A strategical game based on number cards.</p>
+    <hr class="my-4">
+    <p class="lead">
+        <!--<button id='info-button' class="btn btn-secondary">How to play</button>-->
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+            How to play
+        </button>
+        <button class='btn btn-secondary' id='reset'>Reset game</button>
+    </p>
+    <hr class="my-4">
+    <div id='pregame' class='container'>
+        <a href="/playerone" class="btn btn-outline-primary" target="_blank">Player 1</a>
+        <a href="/playertwo" class="btn btn-outline-danger" target="_blank">Player 2</a>
+        <hr class="my-4">
+        <h2>Connected players:</h2>
+        <div id='connectedPlayers'>
+        </div>
+    </div>
 
-<div id='pregame'>
-    <h1><a href="/playerone">P1</a></h1>
-    <h1><a href="/playertwo">P2</a></h1>
-    <p>Connected players:</p>
-    <div id='connectedPlayers'>
+    <div id='gameboard' class='container'>
+        <h3>Player One submits: <span id='p1Input'></span></h3>
+        <h3>Player Two submits: <span id='p2Input'></span></h3>
     </div>
 </div>
 
-<button id='reset'>Reset</button>
+<!--<div id='info-box'>-->
+<!--    <div class='modal-content'>-->
+<!--        <div class='modal-header'>-->
+<!--            <h2 id='info-header'>How to play</h2>-->
+<!--            <span class="close">&times;</span>-->
+<!--        </div>-->
+<!--        <div class='container'>-->
+<!--            <p>Every even number is black. Every odd number is white. Using these hints, try to accumulate the most points over the ten rounds by beating your opponent's number cards. Don't waste your highest cards right away!</p>-->
+<!--            <p>Bring out your phones and use them as controllers. Don't cheat!</p>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!-- bootstrap modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">How to play</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            <p>Every even number is black. Every odd number is white. Using these hints, try to accumulate the most points over the ten rounds by beating your opponent's number cards. Don't waste your highest cards right away!</p>
+            <p>Bring out your phones and use them as controllers. Don't cheat!</p>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
 
 <script>
     /* global $ io location */
@@ -42,15 +90,23 @@
         
         socket.on('player connect', function(data) {
             if (data.playerOne.ready) {
-                $('#connectedPlayers').append('<p>Player 1 connected</p>');
+                $('#connectedPlayers').append('<p>Player 1</p>');
             }
             if (data.playerTwo.ready) {
-                $('#connectedPlayers').append('<p>Player 2 connected</p>');
+                $('#connectedPlayers').append('<p>Player 2</p>');
             }
             
             if (data.playerOne.ready && data.playerTwo.ready) {
                 $('#gameboard').show();
                 $('#pregame').hide();
+                $('#scoreboard').fadeOut('fast', function() {
+                    $('#scoreboard').text(data.playerOne.score + ' - ' + data.playerTwo.score);
+                    $('#scoreboard').fadeIn();
+                });
+                $('#roundCounter').fadeOut('fast', function() {
+                    $('#roundCounter').text('Round: ' + data.gameState.round);
+                    $('#roundCounter').fadeIn();
+                });
             }
         });
         
@@ -87,18 +143,42 @@
                     console.log('p1 is winner');
                     winner = 'playerOne';
                 }
-                else {
+                else if (parseInt(data.playerOne.input) < parseInt(data.playerTwo.input)) {
                     console.log('p2 is winner');
                     winner = 'playerTwo';
+                }
+                else {
+                    console.log('tie');
+                    winner = 'tie';
                 }
                 socket.emit('round', winner);
                 winner = null;
             }
         });
         
+        socket.on('tie', function() {
+            // make everything fade out and put in a TIE sign!
+            var scoreboardText = $('#scoreboard').text();
+            $('#scoreboard').fadeOut('fast', function() {
+                $('#scoreboard').text('Tie');
+                $('#scoreboard').fadeIn(5000, function() {
+                    $('#scoreboard').fadeOut(7000, function() {
+                        $('#scoreboard').text(scoreboardText);
+                        $('#scoreboard').fadeIn('fast');
+                    });
+                });
+            });
+        });
+        
         socket.on('score update', function(data) {
-            $('#scoreboard').text(data.playerOne.score + ' - ' + data.playerTwo.score);
-            $('#roundCounter').text(data.gameState.round);
+            $('#scoreboard').fadeOut('fast', function() {
+                $('#scoreboard').text(data.playerOne.score + ' - ' + data.playerTwo.score);
+                $('#scoreboard').fadeIn();
+            });
+            $('#roundCounter').fadeOut('fast', function() {
+                $('#roundCounter').text('Round: ' + data.gameState.round);
+                $('#roundCounter').fadeIn();
+            });
         });
         
         $('#reset').on('click', function() {
@@ -107,6 +187,21 @@
             socket.emit('reset');
         });
     });
+    
+    // // MODAL BOX CODE
+    // $('#info-button').on('click', function() {
+    //     $('#info-box').css('display', 'block');
+    // });
+    
+    // $('.close').on('click', function() {
+    //     $('#info-box').css('display', 'none');
+    // })
+    
+    // window.onclick = function(event) {
+    //     if (event.target == document.getElementById('info-box')) {
+    //         $('#info-box').css('display', 'none');
+    //     }
+    // }
 </script>
 
 <% include partials/footer %>
