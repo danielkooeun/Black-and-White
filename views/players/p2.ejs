@@ -3,7 +3,7 @@
 <h1>PlayerTwo</h1>
 <button class='readyToPlay'>ready</button>
 
-<div class='p2'>
+<div class='p2 player-cards'>
 </div>
 
 <script>
@@ -21,7 +21,11 @@
 	        	
 	        	if (data.player === 'playerTwo') {
     	        	data.playerTwo.cards.forEach(function(card) {
-    	        	    $('.p2').append("<button class='input'>" + card + "</button>");
+                	    if (card % 2 === 0) {
+                	        $('.p2').append("<button class='input btn btn-block even-cards'>" + card + "</button>");
+                	    }
+                	    else {
+                	        $('.p2').append("<button class='input btn btn-block odd-cards'>" + card + "</button>");
     	        	});
 	        	}
         	}
@@ -29,7 +33,12 @@
         
         socket.on('score update', function(data) {
             data.playerTwo.cards.forEach(function(card) {
-        	    $('.p2').append("<button class='input'>" + card + "</button>");
+        	    if (card % 2 === 0) {
+        	        $('.p1').append("<button class='input btn btn-block even-cards'>" + card + "</button>");
+        	    }
+        	    else {
+        	        $('.p1').append("<button class='input btn btn-block odd-cards'>" + card + "</button>");
+        	    }
         	});
         });
             

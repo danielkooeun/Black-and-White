@@ -7,10 +7,7 @@
     <p id='roundCounter' class="lead">A strategical game based on number cards.</p>
     <hr class="my-4">
     <p class="lead">
-        <!--<button id='info-button' class="btn btn-secondary">How to play</button>-->
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
-            How to play
-        </button>
+        <button id='info-button' class="btn btn-secondary">How to play</button>
         <button class='btn btn-secondary' id='reset'>Reset game</button>
     </p>
     <hr class="my-4">
@@ -29,36 +26,15 @@
     </div>
 </div>
 
-<!--<div id='info-box'>-->
-<!--    <div class='modal-content'>-->
-<!--        <div class='modal-header'>-->
-<!--            <h2 id='info-header'>How to play</h2>-->
-<!--            <span class="close">&times;</span>-->
-<!--        </div>-->
-<!--        <div class='container'>-->
-<!--            <p>Every even number is black. Every odd number is white. Using these hints, try to accumulate the most points over the ten rounds by beating your opponent's number cards. Don't waste your highest cards right away!</p>-->
-<!--            <p>Bring out your phones and use them as controllers. Don't cheat!</p>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!-- bootstrap modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">How to play</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
-            <div class="modal-body">
+<div id='info-box'>
+    <div class='modal-content'>
+        <div class='modal-header'>
+            <h2 id='info-header'>How to play</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class='modal-body'>
             <p>Every even number is black. Every odd number is white. Using these hints, try to accumulate the most points over the ten rounds by beating your opponent's number cards. Don't waste your highest cards right away!</p>
             <p>Bring out your phones and use them as controllers. Don't cheat!</p>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
         </div>
     </div>
 </div>
@@ -188,20 +164,20 @@
         });
     });
     
-    // // MODAL BOX CODE
-    // $('#info-button').on('click', function() {
-    //     $('#info-box').css('display', 'block');
-    // });
+    // MODAL BOX CODE
+    $('#info-button').on('click', function() {
+        $('#info-box').css('display', 'block');
+    });
     
-    // $('.close').on('click', function() {
-    //     $('#info-box').css('display', 'none');
-    // })
+    $('.close').on('click', function() {
+        $('#info-box').css('display', 'none');
+    })
     
-    // window.onclick = function(event) {
-    //     if (event.target == document.getElementById('info-box')) {
-    //         $('#info-box').css('display', 'none');
-    //     }
-    // }
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('info-box')) {
+            $('#info-box').css('display', 'none');
+        }
+    }
 </script>
 
 <% include partials/footer %>
